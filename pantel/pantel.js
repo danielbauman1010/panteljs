@@ -1,14 +1,24 @@
 const control = require('./controlFunctions');
 const fs = require('fs');
 const path = require('path');
+const tokens = require('../controllers/tokensController');
+const users = require('../controllers/usersController');
 
 function executeCommand(user,command){
   return new Promise(function(resolve,reject){
     if(user.username in control.expectingAnswers){
       control.executeListener(user,command).then(function(answer){
-        resolve(answer);
+        control.removeListener(user).then(function(result){
+          resolve(answer);
+        },function(err){
+          reject(err);
+        });
       },function(err){
-        reject(err);
+        control.removeListener(user).then(function(result){
+          reject(err);
+        },function(err){
+          reject(err);
+        });
       });
     } else if(command.toLowerCase() in commands){
       commands[command.toLowerCase()](user).then(function(answer){
@@ -27,8 +37,8 @@ var commands = {}; //commandString: function(user){}
 function loadCommands() {
   commands["logout"] = function(user){
     return new Promise(function(resolve,reject){
-      control.logout(user).then(function(result){
-        resolve(result);
+      tokens.logout(user.username).then(function(result){
+        reject({"message": result});
       },function(err){
         reject(err);
       });
@@ -37,11 +47,15 @@ function loadCommands() {
 
   commands["delete user"] = function(user){
     return new Promise(function(resolve, reject) {
-      control.deleteUser(user).then(function(result){
-        resolve(result);
-      }, function(err){
+      tokens.logout(user.username).then(function(result){
+        users.deleteUser(user.username).then(function(answer){
+          reject({"message": answer});
+        }, function(err){
+          reject(err);
+        })
+      },function(err){
         reject(err);
-      })
+      });
     });
   }
 
@@ -51,6 +65,9 @@ function loadCommands() {
       Object.keys(file.commands).forEach(command => {
         commands[command] = file.commands[command];
       });
+      if(file.setup !== undefined){
+        file.setup();
+      }
     });
   });
 }

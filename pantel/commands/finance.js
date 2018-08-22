@@ -10,7 +10,25 @@ exports.commands = {
             if(isNaN(balance)){
               resolve("Sorry, but you must enter a number.");
             } else {
-              findInCollection()
+              control.findInCollection("finance", {"username": user.username}).then(function(results){
+                if(results.length>0){
+
+                } else {
+                  let userDoc = {};
+                  userDoc.username = user.username;
+                  userDoc["balance"] = balance;
+                  userDoc["purchase history"] = {};
+                  userDoc["income histroy"] = {};
+                  addToCollection("finance", userDoc).then(function(results){
+                    resolve('Balance set, account created.');
+                  },function(err){
+                    reject(err);
+                  });
+                }
+              },function(err){
+                console.log(err);
+                reject(err);
+              });
             }
           },function(err){
             reject(err);

@@ -75,6 +75,7 @@ function logout(username){
   });
 }
 
+exports.makeid = makeid;
 exports.createToken = createToken;
 exports.getUsername = getUsername;
 exports.deleteToken = deleteToken;

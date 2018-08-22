@@ -1,23 +1,43 @@
 const control = require('../controlFunctions');
-
+var perm = "";
+function setup(){
+  control.addCollection("notes").then(function(result){
+    perm = result;
+  },function(err){
+    console.log("Notes library unable to get permission for collection.\n"+err);
+  })
+}
 const commands = {
   "note" : function(user) {
     return new Promise(function(resolve,reject){
       control.addListener(user,function(user,command){
         return new Promise(function(resolve,reject){
-          control.removeListener(user).then(function(result){
-            let query = {};
-            query['username'] = user.username;
-            control.findInCollection(notes,query).then(function(results){
-              let notes = [];
-              if(results.length > 0){
-                notes = results[0][user.username];
-              }
-              notes.push(command);
-              
-            },function(err){
-              reject(err);
-            });
+          let query = {};
+          query['username'] = user.username;
+          control.findInCollection("notes", perm, query).then(function(results){
+            if(results.length>0){
+              let userData = results[0];
+              userData.notes.push(command);
+              let change = {};
+              change['notes'] = userData.notes;
+              let newvals = {};
+              newvals['$set'] = change;
+              control.update('notes', perm, query, newvals).then(function(results){
+                resolve("Dully noted.");
+              },function(err){
+                reject(err);
+              });
+            } else {
+              let userData = {};
+              userData['username'] = user.username;
+              userData['notes'] = [];
+              userData['notes'].push(command);
+              control.addToCollection("notes", perm, userData).then(function(result){
+                resolve("Dully noted.");
+              },function(err){
+                reject(err);
+              });
+            }
           },function(err){
             reject(err);
           });
@@ -30,23 +50,39 @@ const commands = {
     });
   }, "show notes" : function(user){
     return new Promise(function(resolve,reject){
-      if("notes" in user.data){
-        let answer = "";
-        user.data.notes.forEach(n => {
-          answer += n+"<br>";
-        });
-        resolve(answer);
-      } else {
-        resolve("Sorry, no notes noted.");
-      }
+      let query = {};
+      query['username'] = user.username;
+      control.findInCollection("notes", perm, query).then(function(results){
+        if(results.length==0){
+          resolve("I have no record of you taking any notes.");
+        } else {
+          let userData = results[0];
+          if(userData.notes.length==0){
+            resolve("You have no notes.");
+          } else {
+            let answer = "";
+            for(index in userData.notes){
+              answer += userData.notes[index];
+              answer += "<br>";
+            }
+            resolve(answer);
+          }
+        }
+      },function(err){
+        reject(err);
+      })
     });
   }, "delete note" : function(user){
     return new Promise(function(resolve,reject){
       control.addListener(user, function(user,command){
         return new Promise(function(resolve,reject){
-          control.removeListener(user).then(function(result){
-            let data = user.data;
-            if("notes" in data) {
+          let query = {};
+          query['username'] = user.username;
+          control.findInCollection("notes", perm, query).then(function(results){
+            if(results.length == 0){
+              reject("You never took a note.");
+            } else {
+              let data = results[0];
               let note = data.notes.find(n => {
                 return n.includes(command);
               });
@@ -54,8 +90,10 @@ const commands = {
                 data.notes = data.notes.sort(n => n !== note);
                 data.notes.splice(0,1);
                 let dataQuery = {};
-                dataQuery.data = data;
-                control.updateData(user,dataQuery).then(function(result){
+                dataQuery.notes = data.notes;
+                let newvals = {};
+                newvals['$set'] = dataQuery;
+                control.update("notes", perm, query, newvals).then(function(result){
                   resolve("Deleted.");
                 },function(err){
                   reject(err);
@@ -63,8 +101,6 @@ const commands = {
               } else {
                 resolve("Sorry, couldn\'t find your note.");
               }
-            } else {
-              resolve("You have no notes.");
             }
           },function(err){
             reject(err);
@@ -80,3 +116,4 @@ const commands = {
 }
 
 exports.commands = commands;
+exports.setup = setup;

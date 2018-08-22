@@ -147,7 +147,7 @@ function update(collection,query,newvals) {
         mongoCollection.updateOne(query,newvals,function(err,res){
           client.close();
           if(err !== null){
-            reject(err)
+            reject(err);
           } else{
             resolve("Success");
           }
