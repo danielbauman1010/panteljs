@@ -1,0 +1,29 @@
+{
+  "name": "panteljs",
+  "version": "1.0.0",
+  "description": "An virtual assistant",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielbauman1010/panteljs.git"
+  },
+  "author": "Daniel Bauman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danielbauman1010/panteljs/issues"
+  },
+  "homepage": "https://github.com/danielbauman1010/panteljs#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
+    "mongodb": "^3.1.1",
+    "path": "^0.12.7",
+    "uuid": "^3.3.2"
+  }
+}
