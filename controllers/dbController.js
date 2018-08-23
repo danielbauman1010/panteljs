@@ -8,40 +8,33 @@ const url = 'mongodb://'+username+':'+password+'@pantel-shard-00-00-n4gpm.mongod
 const dbname = 'pantel';
 
 function addToCollection(collection, doc) {
-  return new Promise(function(resolve,reject) {
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err,client){
-      if(err !== null){
-        reject(err);
-      }else{
-        var db = client.db(dbname);
-        var mongoCollection = db.collection(collection);
-        mongoCollection.insertOne(doc, function(err,res){
-          client.close();
-          if(err){
-            reject(err);
-          } else {
-            resolve('inserted document');
-          }
-        });
-      }
-    });
+  MongoClient.connect(url, { useNewUrlParser: true }, function(err,client){
+    if(err !== null){
+      console.log(err);
+    }else{
+      var db = client.db(dbname);
+      var mongoCollection = db.collection(collection);
+      mongoCollection.insertOne(doc, function(err,res){
+        client.close();
+        if(err){
+          console.log(err);
+        }
+      });
+    }
   });
 }
 
 function deleteFromCollection(collection, querry) {
-  return new Promise(function(resolve,reject){
     MongoClient.connect(url, function(err, client) {
       if (err !== null) {
-        reject(err);
+        console.log(err);
       }
       let db = client.db(dbname);
       db.collection(collection).remove(querry, function(err, obj) {
-        if (err) reject(err);
-        resolve(obj.result.n + " document(s) deleted");
+        if (err) console.log(err);
         client.close();
       });
     });
-  });
 }
 
 function getCollection(collection){
@@ -137,45 +130,37 @@ function findByName(collection,Name){
 }
 
 function update(collection,query,newvals) {
-  return new Promise(function(resolve,reject) {
-    MongoClient.connect(url, function(err,client){
-      if(err !== null){
-        reject(err);
-      }else{
-        var db = client.db(dbname);
-        var mongoCollection = db.collection(collection);
-        mongoCollection.updateOne(query,newvals,function(err,res){
-          client.close();
-          if(err !== null){
-            reject(err);
-          } else{
-            resolve("Success");
-          }
-        })
-      }
-    });
+  MongoClient.connect(url, function(err,client){
+    if(err !== null){
+      console.log(err);
+    }else{
+      var db = client.db(dbname);
+      var mongoCollection = db.collection(collection);
+      mongoCollection.updateOne(query,newvals,function(err,res){
+        client.close();
+        if(err !== null){
+          console.log(err);
+        }
+      })
+    }
   });
 }
 
 function updateById(collection,id,newvals) {
-  return new Promise(function(resolve,reject) {
-    MongoClient.connect(url, function(err,client){
-      if(err !== null){
-        reject(err);
-        console.log(err);
-      }else{
-        var db = client.db(dbname);
-        var mongoCollection = db.collection(collection);
-        mongoCollection.updateOne({_id: ObjectId(id)},newvals,function(err,res){
-          client.close();
-          if(err){
-             reject(err)
-          }else{
-            resolve(res);
-          }
-        })
-      }
-    });
+  MongoClient.connect(url, function(err,client){
+    if(err !== null){
+      console.log(err);
+      console.log(err);
+    }else{
+      var db = client.db(dbname);
+      var mongoCollection = db.collection(collection);
+      mongoCollection.updateOne({_id: ObjectId(id)},newvals,function(err,res){
+        client.close();
+        if(err){
+           console.log(err)
+        }
+      })
+    }
   });
 }
 

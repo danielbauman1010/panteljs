@@ -41,11 +41,8 @@ function createUser(username,password,email){
                 reject(err);
               } else {
                 userObj["password"] = hash;
-                db.addToCollection('users',userObj).then(function(result){
-                  resolve("<!DOCTYPE html><html>User created. <a href=\"/\">Back</a></html>");
-                },function(err){
-                  reject(err);
-                });
+                db.addToCollection('users',userObj);
+                resolve("<!DOCTYPE html><html>User created. <a href=\"/\">Back</a></html>");
               }
             });
           }
@@ -73,28 +70,23 @@ function login(username,password){
   return new Promise(function(resolve,reject){
     let usernameObj = {};
     usernameObj['username'] = username;
-    db.findInCollection('users',usernameObj).then(function(results){
-      if(results.length>0){
-        let user = results[0];
-        let hashstr = username+"|"+password;
-        bcrypt.compare(hashstr,user.password,function(err, res){
-          if(err){
-            reject(err);
+    getUser(usernameObj).then(function(user){
+      let hashstr = username+"|"+password;
+      bcrypt.compare(hashstr,user.password,function(err, res){
+        if(err){
+          reject(err);
+        } else {
+          if(res) {
+            tokens.createToken(user.username).then(function(token){
+              resolve(token);
+            },function(err){
+              reject(err);
+            });
           } else {
-            if(res) {
-              tokens.createToken(user.username).then(function(token){
-                resolve(token);
-              },function(err){
-                reject(err);
-              });
-            } else {
-              reject({message:"Incorrect username or password."});
-            }
+            reject({message:"Incorrect username or password."});
           }
-        });
-      } else {
-        reject({message: "Username does not exist."});
-      }
+        }
+      });
     },function(err){
       reject(err);
     });
@@ -117,29 +109,17 @@ function getUser(query){
 }
 
 function updateData(username,data){
-  return new Promise(function(resolve, reject) {
-    let query = {};
-    query.username = username;
-    let newData = {};
-    newData["$set"] = data;
-    db.update('users',query, newData).then(function(result){
-      resolve(result);
-    },function(err){
-      reject(err);
-    });
-  });
+  let query = {};
+  query.username = username;
+  let newData = {};
+  newData["$set"] = data;
+  db.update('users',query, newData);
 }
 
 function deleteUser(username){
-  return new Promise(function(resolve, reject) {
-    let query = {};
-    query.username = username;
-    db.deleteFromCollection('users',query).then(function(result){
-      resolve(result);
-    },function(err){
-      reject(err);
-    });
-  });
+  let query = {};
+  query.username = username;
+  db.deleteFromCollection('users',query);
 }
 
 exports.createUser = createUser;

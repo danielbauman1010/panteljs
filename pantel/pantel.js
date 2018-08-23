@@ -8,17 +8,11 @@ function executeCommand(user,command){
   return new Promise(function(resolve,reject){
     if(user.username in control.expectingAnswers){
       control.executeListener(user,command).then(function(answer){
-        control.removeListener(user).then(function(result){
-          resolve(answer);
-        },function(err){
-          reject(err);
-        });
+        control.removeListener(user);
+        resolve(answer);
       },function(err){
-        control.removeListener(user).then(function(result){
-          reject(err);
-        },function(err){
-          reject(err);
-        });
+        control.removeListener(user);
+        reject(err);
       });
     } else if(command.toLowerCase() in commands){
       commands[command.toLowerCase()](user).then(function(answer){
@@ -37,25 +31,16 @@ var commands = {}; //commandString: function(user){}
 function loadCommands() {
   commands["logout"] = function(user){
     return new Promise(function(resolve,reject){
-      tokens.logout(user.username).then(function(result){
-        reject({"message": result});
-      },function(err){
-        reject(err);
-      });
+      tokens.logout(user.username);
+      reject({message: "Logged out successfully."}); //This is a rejection so that the user can see the return home screen rather than the new command screen.
     });
   }
 
   commands["delete user"] = function(user){
     return new Promise(function(resolve, reject) {
-      tokens.logout(user.username).then(function(result){
-        users.deleteUser(user.username).then(function(answer){
-          reject({"message": answer});
-        }, function(err){
-          reject(err);
-        })
-      },function(err){
-        reject(err);
-      });
+      tokens.logout(user.username);
+      users.deleteUser(user.username);
+      reject({"message": "User deleted."});
     });
   }
 

@@ -7,30 +7,11 @@ function createToken(username){
       let previousToken = Object.keys(tokens).find(key => {
         tokens[key] == username;
       });
-      deleteToken(previousToken).then(function(result){
-        if(result){
-          let token = makeid();
-          tokens[token] = username;
-          if(tokens[token] == username) {
-            resolve(token);
-          } else {
-            reject({"message": "Couldn't create Token."});
-          }
-        } else {
-          reject({"message": "Couldn't override previous login."});
-        }
-      },function(err){
-        reject(err);
-      });
-    } else {
-      let token = makeid();
-      tokens[token] = username;
-      if(tokens[token] == username) {
-        resolve(token);
-      } else {
-        reject({"message": "Couldn't create Token."})
-      }
+      deleteToken(previousToken);
     }
+    let token = makeid();
+    tokens[token] = username;
+    resolve(token);
   });
 }
 
@@ -45,34 +26,16 @@ function getUsername(token) {
 }
 
 function deleteToken(token) {
-  return new Promise(function(resolve,reject){
-    if(delete tokens[token]){
-      resolve(!(token in tokens));
-    } else {
-      reject({message: "Couldn\'t log out."});
-    }
-  });
+  delete tokens[token];
 }
 
 function logout(username){
-  return new Promise(function(resolve,reject){
-    if(Object.values(tokens).includes(username)){
-      let token = Object.keys(tokens).find(key => {
-        return tokens[key] == username;
-      });
-      deleteToken(token).then(function(result){
-        if(result){
-          resolve("Logged out succesfully.")
-        } else {
-          resolve("User already logged out.");
-        }
-      },function(err){
-        reject(err);
-      });
-    } else {
-      resolve("User already logged out.");
-    }
-  });
+  if(Object.values(tokens).includes(username)){
+    let token = Object.keys(tokens).find(key => {
+      return tokens[key] == username;
+    });
+    deleteToken(token);
+  }
 }
 
 exports.makeid = makeid;

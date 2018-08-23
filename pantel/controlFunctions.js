@@ -6,32 +6,15 @@ var expectingAnswers = {}; //username: function(user,command){}
 var collections = {}; //collection: permission
 
 function updateData(user, data){
-  return new Promise(function(resolve, reject) {
-    users.updateData(user.username,data).then(function(result){
-      resolve(result);
-    },function(err){
-      reject(err);
-    });
-  });
+  users.updateData(user.username,data);
 }
 
 function addListener(user, func){
-  return new Promise(function(resolve, reject) {
-    expectingAnswers[user.username] = func;
-    resolve("Success");
-  });
+  expectingAnswers[user.username] = func;
 }
 
 function removeListener(user){
-  return new Promise(function(resolve, reject) {
-    resolve(delete expectingAnswers[user.username]);
-  });
-}
-
-function hasListener(user){
-  return new Promise(function(resolve, reject) {
-    resolve(user.username in expectingAnswers);
-  });
+  delete expectingAnswers[user.username];
 }
 
 function executeListener(user,command){
@@ -53,17 +36,9 @@ function addCollection(collection){
 }
 
 function addToCollection(collection, perm, doc){
-  return new Promise(function(resolve, reject) {
-    if(collections[collection] == perm) {
-      db.addToCollection(collection,doc).then(function(result){
-        resolve(result);
-      },function(err){
-        reject(err);
-      });
-    } else {
-      reject("You have no permission to edit this data.");
-    }
-  });
+  if(collections[collection] == perm) {
+    db.addToCollection(collection,doc);
+  }
 }
 
 function findInCollection(collection, perm, query){
@@ -81,21 +56,14 @@ function findInCollection(collection, perm, query){
 }
 
 function update(collection, perm, query, newvals){
-  return new Promise(function(resolve, reject) {
-    if(collections[collection] == perm){
-      db.update(collection,query,newvals).then(function(results){
-        resolve(results);
-      },function(err){
-        reject(err);
-      });
-    }
-  });
+  if(collections[collection] == perm){
+    db.update(collection,query,newvals);
+  }
 }
 
 exports.updateData = updateData;
 exports.addListener = addListener;
 exports.removeListener = removeListener;
-exports.hasListener = hasListener;
 exports.executeListener = executeListener;
 exports.expectingAnswers = expectingAnswers;
 exports.addCollection = addCollection;

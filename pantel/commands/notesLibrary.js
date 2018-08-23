@@ -22,31 +22,22 @@ const commands = {
               change['notes'] = userData.notes;
               let newvals = {};
               newvals['$set'] = change;
-              control.update('notes', perm, query, newvals).then(function(results){
-                resolve("Dully noted.");
-              },function(err){
-                reject(err);
-              });
+              control.update('notes', perm, query, newvals);
+              resolve("Dully noted.");
             } else {
               let userData = {};
               userData['username'] = user.username;
               userData['notes'] = [];
               userData['notes'].push(command);
-              control.addToCollection("notes", perm, userData).then(function(result){
-                resolve("Dully noted.");
-              },function(err){
-                reject(err);
-              });
+              control.addToCollection("notes", perm, userData);
+              resolve("Dully noted.");
             }
           },function(err){
             reject(err);
           });
         });
-      }).then(function(result){
-        resolve("What would you like to note?");
-      },function(err){
-        reject(err);
       });
+      resolve("What would you like to note?");
     });
   }, "show notes" : function(user){
     return new Promise(function(resolve,reject){
@@ -93,11 +84,8 @@ const commands = {
                 dataQuery.notes = data.notes;
                 let newvals = {};
                 newvals['$set'] = dataQuery;
-                control.update("notes", perm, query, newvals).then(function(result){
-                  resolve("Deleted.");
-                },function(err){
-                  reject(err);
-                });
+                control.update("notes", perm, query, newvals);
+                resolve("Deleted.");
               } else {
                 resolve("Sorry, couldn\'t find your note.");
               }
@@ -106,11 +94,8 @@ const commands = {
             reject(err);
           });
         });
-      }).then(function(result){
-        resolve("Write a quote from that note please.");
-      },function(err){
-        reject(err);
       });
+      resolve("Write a quote from that note please.");
     });
   }
 }
