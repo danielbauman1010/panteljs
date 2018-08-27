@@ -97,6 +97,13 @@ const commands = {
       });
       resolve("Write a quote from that note please.");
     });
+  }, "delete notes": function(user){
+    return new Promise(function(resolve, reject) {
+      let query = {};
+      query['username'] = user.username;
+      control.deleteFromCollection('notes', perm, query);
+      resolve('deleted.');
+    });
   }
 }
 

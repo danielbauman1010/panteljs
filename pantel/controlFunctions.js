@@ -61,6 +61,12 @@ function update(collection, perm, query, newvals){
   }
 }
 
+function deleteFromCollection(collection, perm, query){
+  if(collections[collection] == perm){
+    db.deleteFromCollection(collection, query);
+  }
+}
+
 exports.updateData = updateData;
 exports.addListener = addListener;
 exports.removeListener = removeListener;
@@ -70,3 +76,4 @@ exports.addCollection = addCollection;
 exports.addToCollection = addToCollection;
 exports.findInCollection = findInCollection;
 exports.update = update;
+exports.deleteFromCollection = deleteFromCollection;
