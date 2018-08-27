@@ -22,6 +22,13 @@ function vprint(s) {
   }
 }
 
+//error handling:
+function errorStr(err){
+  const preErr = "<!Doctype html><html><head><title>Pantel</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\"><link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css\" integrity=\"sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO\" crossorigin=\"anonymous\"></head><body><div class=\"container container-fluid\"><p>";
+  const postErr = "</p> <a href=\"/\">Back home</a></div></body></html>"
+  return preErr+err+postErr;
+}
+
 //initializing server
 const server = express();
 vprint("Initializing server");
@@ -42,7 +49,7 @@ server.post('/signup',function(req,res){
     res.end(result);
   },function(err){
     vprint(err);
-    res.end("<!DOCTYPE html><html>"+err.message+" <a href=\"/\">Back</a></html>");
+    res.end(errorStr(err.message));
   })
 });
 
@@ -55,7 +62,7 @@ server.post('/login',function(req,res){
     res.end(ui.preToken+token+ui.postToken+"Welcome to pantel, type a command. For help, type help. To logout, type logout."+ui.postAnswer);
   },function(err){
     vprint(err);
-    res.end("<!DOCTYPE html><html>"+err.message+" <a href=\"/\">Back</a></html>");
+    res.end(errorStr(err.message));
   })
 });
 
@@ -70,15 +77,15 @@ server.post('/command', function(req,res){
       res.end(ui.preToken+token+ui.postToken+answer+ui.postAnswer);
       },function(err){
         vprint(err);
-        res.end("<!DOCTYPE html><html>"+err.message+" <a href=\"/\">Back</a></html>");
+        res.end(errorStr(err.message));
       });
     },function(err){
       vprint(err);
-      res.end("<!DOCTYPE html><html>"+err.message+" <a href=\"/\">Back</a></html>");
+      res.end(errorStr(err.message));
     });
   },function(err){
     vprint(err);
-    res.end("<!DOCTYPE html><html>"+err.message+" <a href=\"/\">Back</a></html>");
+    res.end(errorStr(err.message));
   });
 });
 
