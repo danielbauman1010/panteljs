@@ -133,6 +133,17 @@ exports.commands = {
         reject(err);
       });
     });
+  }, 'reset purchase history': function(user){
+    return new Promise(function(resolve, reject) {
+      let query = {};
+      query['username'] = user.username;
+      let data = {};
+      data['purchase history'] = {};
+      let newvals = {};
+      newvals['$set'] = data;
+      control.update('finance',perm,query,newvals);
+      resolve("History reset.");
+    });
   }
 }
 exports.setup = setup;
