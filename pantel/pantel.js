@@ -44,6 +44,17 @@ function loadCommands() {
     });
   }
 
+  commands["help"] = function(user){
+    return new Promise(function(resolve, reject) {
+      let res = "<ul>";
+      for(command in commands){
+        res += "<li>"+command+"</li>";
+      }
+      res += "</ul>";
+      resolve(res);
+    });
+  }
+
   fs.readdir(path.join(__dirname,"commands"), function(err, files){
     files.forEach(f => {
       var file = require("./commands/"+f.slice(0,f.length-3));
